@@ -135,11 +135,11 @@ class _RegisterState extends State<Register> {
                         name.isEmpty ||
                         username.isEmpty ||
                         password.isEmpty) {
-                      normalDialog(
-                          context, 'Please fill all input', Colors.purple);
+                      Dialogs().alertDialog(context, 'Input validation!',
+                          'Please fill all input', Colors.purple);
                     } else if (userType == null || userType.isEmpty) {
-                      normalDialog(
-                          context, 'Please select user type', Colors.purple);
+                      Dialogs().alertDialog(context, 'Input validation!',
+                          'Please select user type', Colors.purple);
                     } else {
                       checkDuplicateUser();
                     }
@@ -174,8 +174,8 @@ class _RegisterState extends State<Register> {
       if (response.toString() == 'null') {
         register();
       } else {
-        normalDialog(context, 'The username \'$username\' is already exist!',
-            Colors.purple);
+        Dialogs().alertDialog(context, 'Duplicate user!',
+            'The username \'$username\' is already exist!', Colors.purple);
       }
     } catch (e) {}
   }
@@ -190,8 +190,8 @@ class _RegisterState extends State<Register> {
       if (response.toString() == 'true') {
         Navigator.pop(context);
       } else {
-        normalDialog(
-            context, 'Something\'s wrong, try again later.', Colors.purple);
+        Dialogs().alertDialog(context, 'Error!',
+            'Something\'s wrong, try again later.', Colors.purple);
       }
     } catch (e) {
       print(e);

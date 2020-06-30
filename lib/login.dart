@@ -88,8 +88,11 @@ class _LoginState extends State<Login> {
                                     password == null ||
                                     username.isEmpty ||
                                     password.isEmpty) {
-                                  normalDialog(context,
-                                      'Please fill all input!', Colors.blue);
+                                  Dialogs().alertDialog(
+                                      context,
+                                      'Input validation!',
+                                      'Please fill all input!',
+                                      Colors.blue);
                                 } else {
                                   login();
                                 }
@@ -122,8 +125,8 @@ class _LoginState extends State<Login> {
                                     backFromRegister = false;
                                   });
 
-                                  normalDialog(context, 'Register success!',
-                                      Colors.blue);
+                                  Dialogs().alertDialog(context, 'Success!',
+                                      'Register success!', Colors.blue);
                                 });
                               },
                             ),
@@ -174,8 +177,8 @@ class _LoginState extends State<Login> {
       //to decode
       var result = json.decode(response.data);
       if (result == null) {
-        normalDialog(
-            context, 'Invalid credentials, please check again', Colors.blue);
+        Dialogs().alertDialog(context, 'Input validation!',
+            'Invalid credentials, please check again', Colors.blue);
       } else {
         for (var map in result) {
           UserModel userModel = UserModel.fromJson(map);
@@ -204,16 +207,16 @@ class _LoginState extends State<Login> {
                     MaterialPageRoute(builder: (context) => Owner()),
                     (route) => false);
               } else {
-                normalDialog(context,
+                Dialogs().alertDialog(context, 'Error!',
                     'Something\' wrong, please try again later', Colors.blue);
               }
             } else {
-              normalDialog(context,
+              Dialogs().alertDialog(context, 'Input validation!',
                   'Please check your username or password again', Colors.blue);
             }
           } else {
-            normalDialog(
-                context, 'Can\'t save user\'s data, try again.', Colors.red);
+            Dialogs().alertDialog(context, 'Error!',
+                'Can\'t save user\'s data, try again.', Colors.red);
           }
         }
       }
@@ -221,17 +224,4 @@ class _LoginState extends State<Login> {
       print(e);
     }
   }
-
-  // Future<void> routeNext(Widget widget, UserModel userModel) async {
-  //   //shared preference, save logged in
-  //   SharedPreferences preferences = await SharedPreferences.getInstance();
-  //   preferences.setString('id', userModel.id);
-  //   preferences.setString('name', userModel.name);
-  //   preferences.setString('userType', userModel.userType);
-
-  //   normalDialog(context, '${userModel.userType}', Colors.brown);
-
-  //   MaterialPageRoute route = MaterialPageRoute(builder: (context) => widget);
-  //   Navigator.pushAndRemoveUntil(context, route, (route) => false);
-  // }
 }

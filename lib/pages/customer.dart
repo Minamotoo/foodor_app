@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ramon/login.dart';
+import 'package:ramon/models/user_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ramon/widgets/customer_browse_menu.dart';
+import 'package:ramon/widgets/customer_see_restaurants.dart';
 
 class Customer extends StatefulWidget {
   @override
@@ -8,20 +11,17 @@ class Customer extends StatefulWidget {
 }
 
 class _CustomerState extends State<Customer> {
+  //variables
   String name = '';
+  List<UserModel> userModels = List();
+  bool infoLoaded = false;
 
+  Widget currentWidget = CustomerBrowseRestaurant();
   //get user who logged in using sharedPreference
   @override
   void initState() {
     super.initState();
     findUser();
-  }
-
-  Future<void> findUser() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    setState(() {
-      name = preferences.getString('name');
-    });
   }
 
   @override
@@ -48,13 +48,30 @@ class _CustomerState extends State<Customer> {
             ),
             ListTile(
               leading: Icon(Icons.restaurant_menu),
-              title: Text('Most order'),
+              title: Text('Browse menu'),
               onTap: () {
-                // Navigator.pop(context);
-                // MaterialPageRoute loginRoute =
-                //     MaterialPageRoute(builder: (value) => Login());
-                // Navigator.push(context, loginRoute);
+                Navigator.pop(context);
+
+                setState(() {
+                  currentWidget = CustomerBrowseRestaurant();
+                });
               },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_balance),
+              title: Text('See restaurants'),
+              onTap: () {
+                Navigator.pop(context);
+
+                setState(() {
+                  currentWidget = CustomerSeeRestaurant();
+                });
+              },
+            ),
+            SizedBox(
+              child: Divider(
+                color: Colors.black,
+              ),
             ),
             ListTile(
               leading: Icon(Icons.exit_to_app),
@@ -69,6 +86,7 @@ class _CustomerState extends State<Customer> {
           ],
         ),
       ),
+      body: currentWidget,
     );
   }
 
@@ -135,5 +153,12 @@ class _CustomerState extends State<Customer> {
         ],
       ),
     );
+  }
+
+  Future<void> findUser() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      name = preferences.getString('name');
+    });
   }
 }

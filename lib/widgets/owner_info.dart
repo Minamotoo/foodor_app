@@ -19,7 +19,11 @@ class OwnerInfo extends StatefulWidget {
 
 class _OwnerInfoState extends State<OwnerInfo> {
   //variables-----------------------------------------------------------------------------
-  String restaurantName, restaurantPhone, restaurantAddress, imageURL;
+  String restaurantName,
+      restaurantPhone,
+      restaurantAddress,
+      restaurantDescription,
+      imageURL;
   double lat, lng;
   String preLat, preLng;
   bool infoLoaded = false;
@@ -66,8 +70,8 @@ class _OwnerInfoState extends State<OwnerInfo> {
     bool gpsServiceStatus = await Geolocator().isLocationServiceEnabled();
 
     if (gpsServiceStatus == false) {
-      normalDialog(
-          context, 'Please turn on GPS then restart apllication', Colors.brown);
+      Dialogs().alertDialog(context, 'GPS is off!',
+          'Please turn on GPS then restart apllication', Colors.brown);
     } else {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
@@ -88,6 +92,7 @@ class _OwnerInfoState extends State<OwnerInfo> {
           restaurantName = userModel.restaurantName.trim();
           restaurantPhone = userModel.restaurantPhone.trim();
           restaurantAddress = userModel.restaurantAddress.trim();
+          restaurantDescription = userModel.restaurantDescription.trim();
           imageURL = userModel.imageURL.trim();
 
           if (userModel.lat.isEmpty ||
@@ -110,13 +115,15 @@ class _OwnerInfoState extends State<OwnerInfo> {
     if (restaurantName.isEmpty &&
         restaurantPhone.isEmpty &&
         restaurantAddress.isEmpty &&
-        imageURL.isEmpty) {
+        restaurantDescription.isEmpty &&
+        '${Constants().url}$imageURL'.isEmpty) {
       return showNoInfo(context);
     } else {
       return showInfo();
     }
   }
 
+  //create content---------------------------------------------------------------------------
   Center showInfo() {
     return Center(
       child: Container(
@@ -128,8 +135,15 @@ class _OwnerInfoState extends State<OwnerInfo> {
               width: 200,
               child: imageURL == null || imageURL.isEmpty
                   ? Center(
-                      child: CenterTitle().centerTitle16(context, 'No image'))
-                  : Image.network(imageURL),
+                      child: CenterTitle().centerTitle16(context, 'No image'),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.network(
+                        '${Constants().url}$imageURL',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
             ),
             //-------------------------------------------------------------------
             Text(
@@ -210,6 +224,34 @@ class _OwnerInfoState extends State<OwnerInfo> {
               height: 10,
             ),
             //-------------------------------------------------------------------
+            Text(
+              'Restaurant description: ',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.blue[800]),
+            ),
+            Row(
+              children: <Widget>[
+                SizedBox(
+                  width: 20,
+                ),
+                Container(
+                  width: 250,
+                  child: Text(
+                    userModel.restaurantDescription.isEmpty ||
+                            userModel.restaurantDescription == null
+                        ? '-'
+                        : userModel.restaurantDescription,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            //-------------------------------------------------------------------
             Container(
               width: 250,
               height: 300,
@@ -224,9 +266,8 @@ class _OwnerInfoState extends State<OwnerInfo> {
     );
   }
 
-  //create content---------------------------------------------------------------------------
-  Widget showNoInfo(BuildContext context) =>
-      CenterTitle().centerTitle(context, 'No info, tap below button to add');
+  Widget showNoInfo(BuildContext context) => CenterTitle()
+      .centerTitle(context, 'No info, tap \'Pen\' icon below to add');
 
   showMap() {
     CameraPosition cameraPosition =

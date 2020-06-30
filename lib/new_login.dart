@@ -80,8 +80,11 @@ class _NewLoginState extends State<NewLogin> {
                                     password == null ||
                                     username.isEmpty ||
                                     password.isEmpty) {
-                                  normalDialog(context,
-                                      'Please fill all input!', Colors.blue);
+                                  Dialogs().alertDialog(
+                                      context,
+                                      'Input validation!',
+                                      'Please fill all input!',
+                                      Colors.blue);
                                 } else {
                                   login();
                                 }
@@ -114,8 +117,8 @@ class _NewLoginState extends State<NewLogin> {
                                     backFromRegister = false;
                                   });
 
-                                  normalDialog(context, 'Register success!',
-                                      Colors.blue);
+                                  Dialogs().alertDialog(context, 'Success!',
+                                      'Register success!', Colors.blue);
                                 });
                               },
                             ),
@@ -139,8 +142,8 @@ class _NewLoginState extends State<NewLogin> {
       //to decode
       var result = json.decode(response.data);
       if (result == null) {
-        normalDialog(
-            context, 'Invalid credentials, please check again', Colors.blue);
+        Dialogs().alertDialog(context, 'Cautions!',
+            'Invalid credentials, please check again', Colors.blue);
       } else {
         for (var map in result) {
           UserModel userModel = UserModel.fromJson(map);
@@ -169,16 +172,16 @@ class _NewLoginState extends State<NewLogin> {
                     MaterialPageRoute(builder: (context) => Owner()),
                     (route) => false);
               } else {
-                normalDialog(context,
+                Dialogs().alertDialog(context, 'Error!',
                     'Something\' wrong, please try again later', Colors.blue);
               }
             } else {
-              normalDialog(context,
+              Dialogs().alertDialog(context, 'Input validation!',
                   'Please check your username or password again', Colors.blue);
             }
           } else {
-            normalDialog(
-                context, 'Can\'t save user\'s data, try again.', Colors.red);
+            Dialogs().alertDialog(context, 'Error!',
+                'Can\'t save user\'s data, try again.', Colors.red);
           }
         }
       }

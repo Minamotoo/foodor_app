@@ -23,7 +23,11 @@ class OwnerEditInfo extends StatefulWidget {
 
 class _OwnerEditInfoState extends State<OwnerEditInfo> {
   //variables----------------------------------------------------------
-  String restaurantName, restaurantPhone, restaurantAddress, imageURL;
+  String restaurantName,
+      restaurantPhone,
+      restaurantAddress,
+      restaurantDescription,
+      imageURL;
   double lat, lng;
   String preLat, preLng;
   bool infoLoaded = false;
@@ -59,7 +63,8 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
-                confirmDialog();
+                onCheckBeforeSave();
+                // confirmDialog();
               },
             )
           ],
@@ -83,8 +88,8 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
     bool gpsServiceStatus = await Geolocator().isLocationServiceEnabled();
 
     if (gpsServiceStatus == false) {
-      normalDialog(
-          context, 'Please turn on GPS then restart apllication', Colors.brown);
+      Dialogs().alertDialog(context, 'GPS is off',
+          'Please turn on GPS then restart apllication', Colors.brown);
     } else {
       var currentLocation = await Geolocator()
           .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
@@ -107,6 +112,7 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
           restaurantName = userModel.restaurantName.trim();
           restaurantPhone = userModel.restaurantPhone.trim();
           restaurantAddress = userModel.restaurantAddress.trim();
+          restaurantDescription = userModel.restaurantDescription.trim();
           imageURL = userModel.imageURL.trim();
 
           if (userModel.lat.isEmpty ||
@@ -139,6 +145,7 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
     if (restaurantName.isEmpty &&
         restaurantPhone.isEmpty &&
         restaurantAddress.isEmpty &&
+        restaurantDescription.isEmpty &&
         imageURL.isEmpty) {
       return Center(
         child: Container(
@@ -146,12 +153,19 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
             child: ListView(
               children: <Widget>[
                 Container(
-                    height: 230,
-                    width: 230,
-                    child: file == null
-                        ? CenterTitle().centerTitle16(
-                            context, 'No image, tap below button to add')
-                        : Image.file(file)),
+                  height: 230,
+                  width: 230,
+                  child: file == null
+                      ? CenterTitle().centerTitle16(
+                          context, 'No image, tap below button to add')
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.file(
+                            file,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                ),
                 Container(
                   margin: EdgeInsets.only(bottom: 10),
                   child: Row(
@@ -206,6 +220,7 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
                 ),
                 Material(
                   child: TextField(
+                    keyboardType: TextInputType.number,
                     onChanged: (value) => restaurantPhone = value.trim(),
                     maxLength: 10,
                     decoration: InputDecoration(
@@ -221,11 +236,26 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
                     onChanged: (value) => restaurantAddress = value.trim(),
                     maxLines: 3,
                     decoration: InputDecoration(
+                        hintText:
+                            'A short address to tell customers where your restaurant is',
                         prefixIcon: Icon(
                           Icons.map,
                           color: Colors.black54,
                         ),
                         labelText: 'Address'),
+                  ),
+                ),
+                Material(
+                  child: TextField(
+                    onChanged: (value) => restaurantDescription = value.trim(),
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                        hintText: 'Tell customers what are your best',
+                        prefixIcon: Icon(
+                          Icons.map,
+                          color: Colors.black54,
+                        ),
+                        labelText: 'Description'),
                   ),
                 ),
                 Container(
@@ -244,14 +274,26 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
             children: <Widget>[
               //image-----------------------------------------------------------
               Container(
-                  height: 230,
-                  width: 230,
-                  child: file == null
-                      ? imageURL.isEmpty
-                          ? CenterTitle().centerTitle16(
-                              context, 'No image, tap below button to add')
-                          : Image.network(imageURL)
-                      : Image.file(file)),
+                height: 230,
+                width: 230,
+                child: file == null
+                    ? imageURL.isEmpty
+                        ? CenterTitle()
+                            .centerTitle16(context, 'Tap below button to add')
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(
+                              '${Constants().url}$imageURL',
+                              fit: BoxFit.cover,
+                            ))
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.file(
+                          file,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+              ),
               Container(
                 margin: EdgeInsets.only(bottom: 10),
                 child: Row(
@@ -311,6 +353,7 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
               Container(
                 margin: EdgeInsets.only(bottom: 10),
                 child: TextFormField(
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                       hintText: 'Phone',
                       focusColor: Colors.brown,
@@ -326,13 +369,29 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
                 child: TextFormField(
                   maxLines: 3,
                   decoration: InputDecoration(
-                      hintText: 'Address',
+                      hintText: 'A short of your address',
                       focusColor: Colors.brown,
                       border: OutlineInputBorder(),
                       labelText: 'Address'),
                   initialValue:
                       restaurantAddress.isEmpty ? '' : restaurantAddress,
                   onChanged: ((value) => restaurantAddress = value.trim()),
+                ),
+              ),
+              //description-----------------------------------------------------------
+              Container(
+                margin: EdgeInsets.only(bottom: 10),
+                child: TextFormField(
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                      hintText: 'Description about your best',
+                      focusColor: Colors.brown,
+                      border: OutlineInputBorder(),
+                      labelText: 'Description'),
+                  initialValue: restaurantDescription.isEmpty
+                      ? ''
+                      : restaurantDescription,
+                  onChanged: ((value) => restaurantDescription = value.trim()),
                 ),
               ),
               //mapp-----------------------------------------------------------
@@ -353,11 +412,11 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
 
   Future<void> chooseImage(ImageSource imageSource) async {
     try {
-      var imagePicker = await ImagePicker.pickImage(
-          source: imageSource, maxHeight: 800, maxWidth: 800);
+      var imagePicker = await ImagePicker()
+          .getImage(source: imageSource, maxWidth: 800, maxHeight: 800);
 
       setState(() {
-        file = imagePicker;
+        file = File(imagePicker.path);
         print('after: $file');
       });
     } catch (e) {}
@@ -387,6 +446,18 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
             snippet: '$lat, $lng'),
       )
     ].toSet();
+  }
+
+  void onCheckBeforeSave() {
+    if (restaurantName.isEmpty ||
+        restaurantPhone.isEmpty ||
+        restaurantAddress.isEmpty ||
+        restaurantDescription.isEmpty) {
+      Dialogs().alertDialog(context, 'Input validation',
+          'All inputs are required', Colors.black87);
+    } else {
+      confirmDialog();
+    }
   }
 
   confirmDialog() {
@@ -457,7 +528,7 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
     if (file == null) {
       // print(imageURL);
       String urlNoimage =
-          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&imageURL=$imageURL&lat=$lat&lng=$lng';
+          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&restaurantDescription=$restaurantDescription&imageURL=$imageURL&lat=$lat&lng=$lng';
 
       Response response = await Dio().get(urlNoimage);
       if (response.toString() == 'true') {
@@ -480,13 +551,13 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
 
       String imageUploadedURL = '${Constants().url}/saveFile.php';
       await Dio().post(imageUploadedURL, data: formData).then((value) async {
-        imageURL = '${Constants().url}/owner/$imageFileName';
+        imageURL = '/owner/$imageFileName';
       });
 
-      String usrImage =
-          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&imageURL=$imageURL&lat=$lat&lng=$lng';
+      String uploadURL =
+          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&restaurantDescription=$restaurantDescription&imageURL=$imageURL&lat=$lat&lng=$lng';
 
-      Response response = await Dio().get(usrImage);
+      Response response = await Dio().get(uploadURL);
 
       if (response.toString() == 'true') {
         print('Saved with pick');
@@ -510,7 +581,7 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
     if (file == null) {
       // print(imageURL);
       String urlNoimage =
-          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&imageURL=$imageURL&lat=$lat&lng=$lng';
+          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&restaurantDescription=$restaurantDescription&imageURL=$imageURL&lat=$lat&lng=$lng';
 
       Response response = await Dio().get(urlNoimage);
       if (response.toString() == 'true') {
@@ -533,13 +604,13 @@ class _OwnerEditInfoState extends State<OwnerEditInfo> {
 
       String imageUploadedURL = '${Constants().url}/saveFile.php';
       await Dio().post(imageUploadedURL, data: formData).then((value) async {
-        imageURL = '${Constants().url}/owner/$imageFileName';
+        imageURL = '/owner/$imageFileName';
       });
 
-      String usrImage =
-          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&imageURL=$imageURL&lat=$lat&lng=$lng';
+      String uploadURL =
+          '${Constants().url}/editUserInfo.php?isAdd=true&id=$userID&restaurantName=$restaurantName&restaurantPhone=$restaurantPhone&restaurantAddress=$restaurantAddress&restaurantDescription=$restaurantDescription&imageURL=$imageURL&lat=$lat&lng=$lng';
 
-      Response response = await Dio().get(usrImage);
+      Response response = await Dio().get(uploadURL);
 
       if (response.toString() == 'true') {
         print('Saved with pick/ no location');

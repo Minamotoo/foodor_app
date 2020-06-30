@@ -7,6 +7,7 @@ class UserModel {
   String restaurantName;
   String restaurantPhone;
   String restaurantAddress;
+  String restaurantDescription;
   String imageURL;
   String lat;
   String lng;
@@ -21,6 +22,7 @@ class UserModel {
       this.restaurantName,
       this.restaurantPhone,
       this.restaurantAddress,
+      this.restaurantDescription,
       this.imageURL,
       this.lat,
       this.lng,
@@ -35,6 +37,7 @@ class UserModel {
     restaurantName = json['restaurantName'];
     restaurantPhone = json['restaurantPhone'];
     restaurantAddress = json['restaurantAddress'];
+    restaurantDescription = json['restaurantDescription'];
     imageURL = json['imageURL'];
     lat = json['lat'];
     lng = json['lng'];
@@ -51,6 +54,7 @@ class UserModel {
     data['restaurantName'] = this.restaurantName;
     data['restaurantPhone'] = this.restaurantPhone;
     data['restaurantAddress'] = this.restaurantAddress;
+    data['restaurantDescription'] = this.restaurantDescription;
     data['imageURL'] = this.imageURL;
     data['lat'] = this.lat;
     data['lng'] = this.lng;
