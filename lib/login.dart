@@ -11,7 +11,7 @@ import 'package:ramon/utilities/dialogs.dart';
 import 'package:ramon/utilities/loading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'models/user_models.dart';
+import 'models/user_model.dart';
 
 class Login extends StatefulWidget {
   @override

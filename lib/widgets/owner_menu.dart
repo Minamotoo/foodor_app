@@ -4,10 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ramon/models/menu_model.dart';
-import 'package:ramon/models/user_models.dart';
 import 'package:ramon/utilities/center_title.dart';
 import 'package:ramon/utilities/constants.dart';
 import 'package:ramon/utilities/loading.dart';
+import 'package:ramon/utilities/dialogs.dart';
 import 'package:ramon/widgets/owner_add_menu.dart';
 import 'package:ramon/widgets/owner_edit_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -87,7 +87,7 @@ class _OwnerMenuState extends State<OwnerMenu> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String ownerID = sharedPreferences.getString('id');
     String url =
-        '${Constants().url}/getFoodWhereID.php?isAdd=true&ownerID=$ownerID';
+        '${Constants().url}/getFoodWhereOwnerID.php?isAdd=true&ownerID=$ownerID';
 
     Response response = await Dio().get(url);
 
@@ -238,6 +238,22 @@ class _OwnerMenuState extends State<OwnerMenu> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
+                        listFood[index].promotionStatus == '1'
+                            ? IconButton(
+                                icon: Icon(Icons.star),
+                                color: Colors.yellow[800],
+                                onPressed: () {
+                                  Dialogs().normalDialog(
+                                      context,
+                                      'Promotion: ${listFood[index].promotionDetail}',
+                                      Colors.brown);
+                                },
+                              )
+                            : IconButton(
+                                icon: Icon(Icons.star),
+                                color: Colors.white,
+                                onPressed: () {},
+                              ),
                         IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {

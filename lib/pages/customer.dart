@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ramon/login.dart';
-import 'package:ramon/models/user_models.dart';
+import 'package:ramon/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ramon/widgets/customer_browse_menu.dart';
-import 'package:ramon/widgets/customer_see_restaurants.dart';
+import 'package:ramon/widgets/customer_browse_restaurants.dart';
 
 class Customer extends StatefulWidget {
   @override
@@ -16,7 +16,7 @@ class _CustomerState extends State<Customer> {
   List<UserModel> userModels = List();
   bool infoLoaded = false;
 
-  Widget currentWidget = CustomerBrowseRestaurant();
+  Widget currentWidget = CustomerBrowseMenu();
   //get user who logged in using sharedPreference
   @override
   void initState() {
@@ -46,25 +46,15 @@ class _CustomerState extends State<Customer> {
                     fit: BoxFit.cover),
               ),
             ),
+
+            //my orders
             ListTile(
-              leading: Icon(Icons.restaurant_menu),
-              title: Text('Browse menu'),
+              leading: Icon(Icons.done_all),
+              title: Text('My orders'),
               onTap: () {
                 Navigator.pop(context);
-
                 setState(() {
-                  currentWidget = CustomerBrowseRestaurant();
-                });
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.account_balance),
-              title: Text('See restaurants'),
-              onTap: () {
-                Navigator.pop(context);
-
-                setState(() {
-                  currentWidget = CustomerSeeRestaurant();
+                  // currentWidget = CustomerShowOrders();
                 });
               },
             ),
@@ -73,6 +63,39 @@ class _CustomerState extends State<Customer> {
                 color: Colors.black,
               ),
             ),
+
+            //browse menu
+            ListTile(
+              leading: Icon(Icons.fastfood),
+              title: Text('Browse menu'),
+              onTap: () {
+                Navigator.pop(context);
+
+                setState(() {
+                  currentWidget = CustomerBrowseMenu();
+                });
+              },
+            ),
+
+            //see restaurant
+            ListTile(
+              leading: Icon(Icons.account_balance),
+              title: Text('See restaurant'),
+              onTap: () {
+                Navigator.pop(context);
+
+                setState(() {
+                  currentWidget = CustomerBrowseRestaurant();
+                });
+              },
+            ),
+            SizedBox(
+              child: Divider(
+                color: Colors.black,
+              ),
+            ),
+
+            //logout
             ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text(

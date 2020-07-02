@@ -29,8 +29,14 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
 
   File file;
 
-  String newFoodImageURL, newName, newPrice, newDescription;
-
+  String newFoodImageURL,
+      newName,
+      newPrice,
+      newDescription,
+      newPromotionStatus,
+      newPromotionDetail,
+      newFoodType;
+  TextEditingController promotionDetailController;
   //init state
   @override
   void initState() {
@@ -40,6 +46,13 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
     newName = menuModel.name;
     newPrice = menuModel.price;
     newDescription = menuModel.description;
+
+    newPromotionStatus = menuModel.promotionStatus;
+    newPromotionDetail = menuModel.promotionDetail;
+    newFoodType = menuModel.foodType;
+
+    promotionDetailController =
+        TextEditingController(text: '${menuModel.promotionDetail}');
 
     print('new alone $newFoodImageURL');
     print('from last page ${menuModel.foodImageURL}');
@@ -200,6 +213,91 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
                 ),
               ),
             ),
+
+            //food type
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          value: 'food',
+                          groupValue: newFoodType,
+                          onChanged: (value) => setState(() {
+                            newFoodType = value;
+                          }),
+                        ),
+                        Text(
+                          'Food',
+                          style: TextStyle(fontSize: 16),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          value: 'drink',
+                          groupValue: newFoodType,
+                          onChanged: (value) => setState(() {
+                            newFoodType = value;
+                          }),
+                        ),
+                        Text(
+                          'Drink',
+                          style: TextStyle(fontSize: 16),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            //promotion
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: Material(
+                child: TextField(
+                  onChanged: (value) => newPromotionDetail = value.trim(),
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                      prefixIcon: menuModel.promotionStatus == '1'
+                          ? Icon(
+                              Icons.star,
+                              color: Colors.yellow[800],
+                            )
+                          : Icon(
+                              Icons.star,
+                              color: Colors.black54,
+                            ),
+                      labelText: 'Promotion'),
+                  controller: promotionDetailController,
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: FlatButton(
+                      child: Text(
+                        'REMOVE THIS PROMOTION',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      onPressed: () => menuModel.promotionStatus == '1'
+                          ? confirmRemovePromotion(context,
+                              'Do you really want to remove this promotion?')
+                          : Dialogs().normalDialog(
+                              context,
+                              'This menu has no promotion, you can not remove',
+                              Colors.brown)),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -265,7 +363,14 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
                   onPressed: () {
                     Navigator.pop(context);
                     onUpdate(
-                        id, newName, newPrice, newDescription, newFoodImageURL);
+                        id,
+                        newName,
+                        newPrice,
+                        newDescription,
+                        newFoodImageURL,
+                        newFoodType,
+                        newPromotionStatus,
+                        newPromotionDetail);
                   },
                 ),
               ),
@@ -291,19 +396,25 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
         });
   }
 
-  onUpdate(String id, String newName, String newPrice, String newDescription,
-      String newFoodImageURL) async {
+  onUpdate(
+      String id,
+      String newName,
+      String newPrice,
+      String newDescription,
+      String newFoodImageURL,
+      String newFoodType,
+      String newPromotionStatus,
+      String newPromotionDetail) async {
     setState(() {
       updating = true;
     });
-    // print(file);
-    // print(deletedImage);
-    // print(id);
-    // print(newName);
-    // print(newPrice);
-    // print(newDescription);
-    // print(newFoodImageURL);
     double newPriceDouble = double.parse(newPrice);
+    if (newPromotionDetail.isEmpty) {
+      newPromotionStatus = '0';
+    } else {
+      newPromotionStatus = '1';
+    }
+
     String newFoodImageUploadURL = '${Constants().url}/editImageFood.php';
 
     Random random = Random();
@@ -328,7 +439,7 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
 
     //upload data
     String url =
-        '${Constants().url}/editFoodWhereID.php/?isAdd=true&id=$id&newName=$newName&newPrice=$newPriceDouble&newDescription=$newDescription&newFoodImageURL=$newFoodImageURL';
+        '${Constants().url}/editFoodWhereID.php/?isAdd=true&id=$id&newName=$newName&newPrice=$newPriceDouble&newDescription=$newDescription&newFoodType=$newFoodType&newPromotionStatus=$newPromotionStatus&newPromotionDetail=$newPromotionDetail&newFoodImageURL=$newFoodImageURL';
 
     try {
       await Dio().get(url).then((value) {
@@ -338,6 +449,9 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
             newPrice = '';
             newDescription = '';
             newFoodImageURL = '';
+            newFoodType = '';
+            newPromotionStatus = '0';
+            newPromotionDetail = '';
           });
           Navigator.pop(context);
         } else {
@@ -348,5 +462,64 @@ class _OwnerEditMenuState extends State<OwnerEditMenu> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<void> confirmRemovePromotion(
+      BuildContext context, String message) async {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Confirm removing this promotion'),
+              content: Text(message),
+              actions: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: RaisedButton(
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          side: BorderSide(color: Colors.brown),
+                        ),
+                        color: Colors.brown,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            menuModel.promotionStatus = '0';
+                            menuModel.promotionDetail = '';
+                            newPromotionStatus = '0';
+                            newPromotionDetail = '';
+
+                            promotionDetailController.clear();
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: RaisedButton(
+                        child: Text(
+                          'Dismiss',
+                          style: TextStyle(color: Colors.brown),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          side: BorderSide(color: Colors.brown),
+                        ),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ));
   }
 }

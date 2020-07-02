@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ramon/models/user_models.dart';
+import 'package:ramon/models/user_model.dart';
 import 'package:ramon/utilities/constants.dart';
 import 'package:ramon/utilities/dialogs.dart';
 import 'package:ramon/utilities/loading.dart';

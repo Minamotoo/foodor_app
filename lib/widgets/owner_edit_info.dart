@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ramon/models/user_models.dart';
+import 'package:ramon/models/user_model.dart';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';

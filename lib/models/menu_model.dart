@@ -5,14 +5,21 @@ class MenuModel {
   String name;
   String price;
   String description;
+  String foodType;
+  String promotionStatus;
+  String promotionDetail;
 
-  MenuModel(
-      {this.id,
-      this.ownerID,
-      this.foodImageURL,
-      this.name,
-      this.price,
-      this.description});
+  MenuModel({
+    this.id,
+    this.ownerID,
+    this.foodImageURL,
+    this.name,
+    this.price,
+    this.description,
+    this.foodType,
+    this.promotionStatus,
+    this.promotionDetail,
+  });
 
   MenuModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -21,6 +28,9 @@ class MenuModel {
     name = json['name'];
     price = json['price'];
     description = json['description'];
+    foodType = json['foodType'];
+    promotionStatus = json['promotionStatus'];
+    promotionDetail = json['promotionDetail'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +41,9 @@ class MenuModel {
     data['name'] = this.name;
     data['price'] = this.price;
     data['description'] = this.description;
+    data['foodType'] = this.foodType;
+    data['promotionStatus'] = this.promotionStatus;
+    data['promotionDetail'] = this.promotionDetail;
     return data;
   }
 }

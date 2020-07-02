@@ -24,7 +24,10 @@ class _OwnerAddMenuState extends State<OwnerAddMenu> {
   String description = '';
   double price = 0;
   bool saving = false;
-  //init state
+
+  String foodType = '';
+  int promotionStatus = 0;
+  String promotionDetail = '';
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +50,7 @@ class _OwnerAddMenuState extends State<OwnerAddMenu> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
-                //TODO: ไว้กลับมาทำกรณีที่แก้ไขอาหารแบบไม่เปลี่ยนภาพด้วย
-                file == null || name.isEmpty || price == 0
+                file == null || name.isEmpty || price == 0 || foodType.isEmpty
                     ? onCheck()
                     : onSaveWithImage();
               },
@@ -168,6 +170,105 @@ class _OwnerAddMenuState extends State<OwnerAddMenu> {
                 ),
               ),
             ),
+
+            //food type
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          value: 'food',
+                          groupValue: foodType,
+                          onChanged: (value) => setState(() {
+                            foodType = value;
+                          }),
+                        ),
+                        Text(
+                          'Food',
+                          style: TextStyle(fontSize: 16),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          value: 'drink',
+                          groupValue: foodType,
+                          onChanged: (value) => setState(() {
+                            foodType = value;
+                          }),
+                        ),
+                        Text(
+                          'Drink',
+                          style: TextStyle(fontSize: 16),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            //divider
+            SizedBox(
+              height: 10,
+              child: Divider(
+                color: Colors.black87,
+              ),
+            ),
+
+            //promotion
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          value: 1,
+                          groupValue: promotionStatus,
+                          onChanged: (value) => setState(() {
+                            promotionStatus = value;
+                          }),
+                        ),
+                        Text(
+                          'Promotion (Optional) \n \n If you accidently tap, \n you can just leave it blank',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            //promotionDetail
+            promotionStatus == 1
+                ? Container(
+                    margin: EdgeInsets.only(bottom: 10),
+                    child: Material(
+                      child: TextFormField(
+                        autofocus: true,
+                        onChanged: (value) => promotionDetail = value.trim(),
+                        maxLines: 2,
+                        decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                            ),
+                            labelText: 'Promotion detail'),
+                      ),
+                    ),
+                  )
+                : SizedBox(
+                    height: 20,
+                  ),
           ],
         ),
       ),
@@ -188,42 +289,76 @@ class _OwnerAddMenuState extends State<OwnerAddMenu> {
   }
 
   onCheck() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Alert'),
-            content:
-                Text('Please input atleast \'Image\',  \'Name\' and \'Price\''),
-            actions: <Widget>[
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: BorderSide(color: Colors.brown),
+    if (foodType.isEmpty) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Food type is required'),
+              content: Text('Please select whether this is food or drink'),
+              actions: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      side: BorderSide(color: Colors.brown),
+                    ),
+                    color: Colors.brown,
+                    child: Text(
+                      'OK',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                  color: Colors.brown,
-                  child: Text(
-                    'OK',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // onUpdateLocation();
-                  },
                 ),
-              ),
-            ],
-          );
-        });
+              ],
+            );
+          });
+    } else if (file == null || name.isEmpty || price == 0) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Need more info about this menu'),
+              content: Text(
+                  'Please input atleast \'Image\',  \'Name\' and \'Price\''),
+              actions: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      side: BorderSide(color: Colors.brown),
+                    ),
+                    color: Colors.brown,
+                    child: Text(
+                      'OK',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            );
+          });
+    }
   }
 
+  //TODO: save with new data
   Future<void> onSaveWithImage() async {
     setState(() {
       saving = true;
     });
     String foodImageUploadURL = '${Constants().url}/saveFood.php';
+
+    if (promotionDetail.isEmpty) {
+      promotionStatus = 0;
+    }
 
     Random random = Random();
     int randomNum = random.nextInt(1000000);
@@ -242,7 +377,7 @@ class _OwnerAddMenuState extends State<OwnerAddMenu> {
       await Dio().post(foodImageUploadURL, data: formData).then((value) async {
         foodImageURL = '/foods/$imageFileName';
         String uploadURL =
-            '${Constants().url}/addFood.php?isAdd=true&ownerID=$ownerID&foodImageURL=$foodImageURL&name=$name&price=$price&description=$description';
+            '${Constants().url}/addFood.php?isAdd=true&ownerID=$ownerID&foodImageURL=$foodImageURL&name=$name&price=$price&description=$description&foodType=$foodType&promotionStatus=$promotionStatus&promotionDetail=$promotionDetail';
         print('saved with this image: $foodImageURL');
 
         await Dio().get(uploadURL).then((value) => Navigator.pop(context));
