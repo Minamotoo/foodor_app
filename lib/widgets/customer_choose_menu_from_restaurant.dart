@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:ramon/models/menu_model.dart';
 import 'package:ramon/models/user_model.dart';
+import 'package:ramon/models/ordered_menu_model.dart';
+import 'package:ramon/utilities/center_title.dart';
 import 'package:ramon/utilities/constants.dart';
 import 'package:ramon/utilities/dialogs.dart';
 import 'package:ramon/utilities/loading.dart';
@@ -26,14 +28,12 @@ class _CustomerChooseMenuFromRestaurantState
   UserModel userModel;
   List<MenuModel> menuLists = List();
 
-  List orderedListID = List();
-  List orderedListName = List();
-  List orderedListPrice = List();
-  List orderedListImageURL = List();
+  List<OrderedMenuModel> orderedList = List();
 
   bool infoLoaded = false;
+  bool foundDuplicate = false;
 
-  double netPrice = 0;
+  int netPrice = 0;
   int countList = 0;
 
   //inistate
@@ -56,7 +56,9 @@ class _CustomerChooseMenuFromRestaurantState
           IconButton(
             icon: Icon(Icons.more_vert),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              showRestaurantInfo();
+            },
           )
         ],
       ),
@@ -76,18 +78,7 @@ class _CustomerChooseMenuFromRestaurantState
           children: <Widget>[
             InkWell(
               onTap: () {
-                var map = Map();
-                var listMap = List();
-                orderedListID.forEach((element) {
-                  if (!map.containsKey(element)) {
-                    map[element] = 1;
-                  } else {
-                    map[element] += 1;
-                  }
-                });
-                print(map);
-
-                orderedListID.length == 0
+                orderedList.length == 0
                     ? Dialogs().normalDialog(context,
                         'You haven\'t chosen any menu yet!', Colors.black87)
                     : showDialog(
@@ -95,25 +86,26 @@ class _CustomerChooseMenuFromRestaurantState
                         builder: (context) {
                           return AlertDialog(
                             title: Text(
-                              'Review your order',
+                              'Review your orders',
                               style: TextStyle(color: Colors.deepOrangeAccent),
                             ),
                             content: ListView.separated(
-                              itemCount: orderedListID.length,
+                              itemCount: orderedList.length,
                               itemBuilder: (context, index) {
                                 return ListTile(
-                                  leading: CircleAvatar(
-                                    radius: 27,
-                                    backgroundColor: Colors.yellow[800],
-                                    child: CircleAvatar(
-                                      radius: 25,
-                                      backgroundImage: NetworkImage(
-                                          orderedListImageURL[index]),
+                                    leading: CircleAvatar(
+                                      radius: 27,
+                                      backgroundColor: Colors.deepOrangeAccent,
+                                      child: CircleAvatar(
+                                        radius: 25,
+                                        backgroundImage: NetworkImage(
+                                            '${Constants().url}${orderedList[index].foodImageURL}'),
+                                      ),
                                     ),
-                                  ),
-                                  title:
-                                      Text(orderedListName[index].toString()),
-                                );
+                                    title: Text('${orderedList[index].name}'),
+                                    trailing: orderedList[index].amount > 1
+                                        ? Text('${orderedList[index].amount}')
+                                        : Text(''));
                               },
                               separatorBuilder:
                                   (BuildContext context, int index) {
@@ -151,7 +143,9 @@ class _CustomerChooseMenuFromRestaurantState
               icon: Icon(Icons.shopping_cart),
               color: Colors.deepOrangeAccent,
               iconSize: 30,
-              onPressed: () {},
+              onPressed: () {
+                //process to buy
+              },
             ),
           ],
         ),
@@ -160,7 +154,24 @@ class _CustomerChooseMenuFromRestaurantState
   }
 
   //show content
-
+  Widget showReviewDialog() => ListView.separated(
+        itemCount: orderedList.length,
+        itemBuilder: (context, index) => ListTile(
+          leading: CircleAvatar(
+            backgroundColor: Colors.deepOrangeAccent,
+            radius: 30,
+            child: CircleAvatar(
+                // backgroundImage: NetworkImage('${}'),//////////////////////////////////////////////////////////////////////////////////////////
+                ),
+          ),
+        ),
+        separatorBuilder: (BuildContext context, int index) {
+          return Divider(
+            height: 4,
+            color: Colors.grey,
+          );
+        },
+      );
   Widget showMenuOfRestaurant() => ListView.separated(
         itemCount: menuLists.length,
         itemBuilder: (context, index) => Row(
@@ -240,68 +251,90 @@ class _CustomerChooseMenuFromRestaurantState
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 IconButton(
+                  //add
                   icon: Icon(Icons.add),
                   color: Colors.green,
                   onPressed: () {
+                    String thisMenuID = menuLists[index].id;
+                    String thisMenuName = menuLists[index].name;
+                    String thisMenuOwnerID = menuLists[index].ownerID;
+                    double doublePrice = double.parse(menuLists[index].price);
+                    int thisMenuPrice = doublePrice.toInt();
+                    int thisMenuAmount = 1;
+                    String thisFoodImageURL = menuLists[index].foodImageURL;
+
                     setState(() {
                       countList++;
-                      netPrice += double.parse(menuLists[index].price);
-                      var menuID = menuLists[index].id;
-                      var menuName = menuLists[index].name;
-                      var menuPrice = menuLists[index].price; //String
-                      var menuImageURL =
-                          '${Constants().url}${menuLists[index].foodImageURL}';
-                      orderedListID.add(menuID);
-                      orderedListName.add(menuName);
-                      orderedListPrice.add(menuPrice);
-                      orderedListImageURL.add(menuImageURL);
-                      print(orderedListID);
-                      print(orderedListName);
-                      print(orderedListPrice);
-                      print(orderedListImageURL);
-                      print('-----------');
+                      netPrice += thisMenuPrice;
+
+                      if (countList > 0) {
+                        if (orderedList.length == 0) {
+                          OrderedMenuModel om = OrderedMenuModel();
+
+                          om.id = thisMenuID;
+                          om.name = thisMenuName;
+                          om.price = thisMenuPrice;
+                          om.ownerID = thisMenuOwnerID;
+                          om.amount = thisMenuAmount;
+                          om.foodImageURL = thisFoodImageURL;
+
+                          orderedList.add(om);
+                          om = null;
+                        } else {
+                          OrderedMenuModel om = OrderedMenuModel();
+                          OrderedMenuModel toAdd = OrderedMenuModel();
+
+                          om.id = thisMenuID;
+                          om.name = thisMenuName;
+                          om.price = thisMenuPrice;
+                          om.ownerID = thisMenuOwnerID;
+                          om.amount = thisMenuAmount;
+                          om.foodImageURL = thisFoodImageURL;
+
+                          for (var ol in orderedList) {
+                            if (ol.id == om.id) {
+                              ol.amount += thisMenuAmount;
+                              ol.price += thisMenuPrice;
+                              foundDuplicate = true;
+                            } else {
+                              toAdd.id = om.id;
+                              toAdd.name = om.name;
+                              toAdd.ownerID = om.ownerID;
+                              toAdd.price = om.price;
+                              toAdd.amount = om.amount;
+                              toAdd.foodImageURL = om.foodImageURL;
+                              foundDuplicate = false;
+                            }
+                            if (foundDuplicate == true) {
+                              break;
+                            }
+                          }
+                          if (foundDuplicate == false) {
+                            orderedList.add(toAdd);
+                          }
+                          om = null;
+                          toAdd = null;
+                        }
+
+                        thisMenuID = null;
+                        thisMenuName = null;
+                        thisMenuPrice = null;
+                        thisMenuOwnerID = null;
+                        thisMenuAmount = null;
+                        thisFoodImageURL = null;
+                      }
                     });
+                    print(orderedList);
                   },
                 ),
                 IconButton(
+                  //delete
                   icon: Icon(Icons.delete),
                   color: Colors.blueGrey,
                   onPressed: () {
-                    if (countList > 0 && netPrice > 0) {
-                      var thisFoodID = orderedListID.firstWhere(
-                          (element) => element == menuLists[index].id,
-                          orElse: () => Dialogs().normalDialog(
-                              context,
-                              'There is no this menu in your order',
-                              Colors.black87));
-                      if (thisFoodID == menuLists[index].id) {
-                        var thisFoodName = orderedListName.firstWhere(
-                            (element) => element == menuLists[index].name);
-                        var thisFoodPrice = orderedListPrice.firstWhere(
-                            (element) => element == menuLists[index].price);
-                        var thisFoodImageURL = orderedListImageURL.firstWhere(
-                            (element) =>
-                                element ==
-                                '${Constants().url}${menuLists[index].foodImageURL}');
-                        setState(() {
-                          countList--;
-                          netPrice -= double.parse(menuLists[index].price);
-                          orderedListID.remove(thisFoodID);
-                          orderedListName.remove(thisFoodName);
-                          orderedListPrice.remove(thisFoodPrice);
-                          orderedListImageURL.remove(thisFoodImageURL);
-                          print(orderedListID);
-                          print(orderedListName);
-                          print(orderedListPrice);
-                          print(orderedListImageURL);
-                        });
-                      }
-                    }
+                    if (countList > 0 && netPrice > 0) {}
                   },
                 ),
-                Container(
-                  child: Text(''),
-                )
               ],
             )
           ],
@@ -313,6 +346,52 @@ class _CustomerChooseMenuFromRestaurantState
           );
         },
       );
+
+  void showRestaurantInfo() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(20),
+                height: 150,
+                width: 150,
+                child: userModel.imageURL == null || userModel.imageURL.isEmpty
+                    ? Center(
+                        child: CenterTitle().centerTitle14(context, 'No image'),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          '${Constants().url}${userModel.imageURL}',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    '${userModel.restaurantName}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.blue[800]),
+                  ),
+                  Text(
+                    '${userModel.restaurantPhone}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.blue[800]),
+                  ),
+                ],
+              ),
+            ],
+          );
+        });
+  }
 
   //methods
   Future<void> getMenu() async {
