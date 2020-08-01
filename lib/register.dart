@@ -10,7 +10,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  String name, username, password, userType;
+  String name, username, password, userType, phone;
   bool notLoading = true;
 
   @override
@@ -45,8 +45,12 @@ class _RegisterState extends State<Register> {
                 width: 150,
               ),
               Material(
-                child: TextField(
+                child: TextFormField(
                   onChanged: (value) => name = value.trim(),
+                  onFieldSubmitted: (v) {
+                    FocusScope.of(context).nextFocus();
+                  },
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.account_circle,
@@ -56,8 +60,12 @@ class _RegisterState extends State<Register> {
                 ),
               ),
               Material(
-                child: TextField(
+                child: TextFormField(
                   onChanged: (value) => username = value.trim(),
+                  onFieldSubmitted: (v) {
+                    FocusScope.of(context).nextFocus();
+                  },
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.account_box,
@@ -67,8 +75,12 @@ class _RegisterState extends State<Register> {
                 ),
               ),
               Material(
-                child: TextField(
+                child: TextFormField(
                   onChanged: (value) => password = value.trim(),
+                  onFieldSubmitted: (v) {
+                    FocusScope.of(context).nextFocus();
+                  },
+                  textInputAction: TextInputAction.next,
                   obscureText: true,
                   decoration: InputDecoration(
                       prefixIcon: Icon(
@@ -76,6 +88,22 @@ class _RegisterState extends State<Register> {
                         color: Colors.black87,
                       ),
                       labelText: 'Password'),
+                ),
+              ),
+              Material(
+                child: TextFormField(
+                  onChanged: (value) => phone = value.trim(),
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (v) {
+                    FocusScope.of(context).nextFocus();
+                  },
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.phone,
+                        color: Colors.black87,
+                      ),
+                      labelText: 'Phone number'),
                 ),
               ),
               SizedBox(
@@ -132,9 +160,11 @@ class _RegisterState extends State<Register> {
                     if (name == null ||
                         username == null ||
                         password == null ||
+                        phone == null ||
                         name.isEmpty ||
                         username.isEmpty ||
-                        password.isEmpty) {
+                        password.isEmpty ||
+                        phone.isEmpty) {
                       Dialogs().alertDialog(context, 'Input validation!',
                           'Please fill all input', Colors.purple);
                     } else if (userType == null || userType.isEmpty) {
@@ -182,7 +212,7 @@ class _RegisterState extends State<Register> {
 
   Future<void> register() async {
     String url =
-        '${Constants().url}/addUser.php?isAdd=true&name=$name&username=$username&password=$password&userType=$userType';
+        '${Constants().url}/addUser.php?isAdd=true&name=$name&username=$username&password=$password&userType=$userType&phone=$phone';
 
     try {
       Response response = await Dio().get(url);
@@ -190,6 +220,9 @@ class _RegisterState extends State<Register> {
       if (response.toString() == 'true') {
         Navigator.pop(context);
       } else {
+        setState(() {
+          notLoading = true;
+        });
         Dialogs().alertDialog(context, 'Error!',
             'Something\'s wrong, try again later.', Colors.purple);
       }

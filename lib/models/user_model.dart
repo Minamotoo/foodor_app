@@ -4,6 +4,7 @@ class UserModel {
   String username;
   String password;
   String userType;
+  String phone;
   String restaurantName;
   String restaurantPhone;
   String restaurantAddress;
@@ -19,6 +20,7 @@ class UserModel {
       this.username,
       this.password,
       this.userType,
+      this.phone,
       this.restaurantName,
       this.restaurantPhone,
       this.restaurantAddress,
@@ -34,6 +36,7 @@ class UserModel {
     username = json['username'];
     password = json['password'];
     userType = json['userType'];
+    phone = json['phone'];
     restaurantName = json['restaurantName'];
     restaurantPhone = json['restaurantPhone'];
     restaurantAddress = json['restaurantAddress'];
@@ -51,6 +54,7 @@ class UserModel {
     data['username'] = this.username;
     data['password'] = this.password;
     data['userType'] = this.userType;
+    data['phone'] = this.phone;
     data['restaurantName'] = this.restaurantName;
     data['restaurantPhone'] = this.restaurantPhone;
     data['restaurantAddress'] = this.restaurantAddress;

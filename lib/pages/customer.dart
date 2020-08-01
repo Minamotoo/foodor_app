@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ramon/login.dart';
 import 'package:ramon/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ramon/widgets/customer_orders.dart';
 import 'package:ramon/widgets/customer_browse_menu.dart';
 import 'package:ramon/widgets/customer_browse_restaurants.dart';
 
@@ -16,7 +17,7 @@ class _CustomerState extends State<Customer> {
   List<UserModel> userModels = List();
   bool infoLoaded = false;
 
-  Widget currentWidget = CustomerBrowseMenu();
+  Widget currentWidget = CustomerOrders();
   //get user who logged in using sharedPreference
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _CustomerState extends State<Customer> {
               onTap: () {
                 Navigator.pop(context);
                 setState(() {
-                  // currentWidget = CustomerShowOrders();
+                  currentWidget = CustomerOrders();
                 });
               },
             ),

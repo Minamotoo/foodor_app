@@ -9,6 +9,7 @@ import 'package:ramon/utilities/center_title.dart';
 import 'package:ramon/utilities/constants.dart';
 import 'package:ramon/utilities/loading.dart';
 import 'package:ramon/widgets/customer_choose_menu_from_restaurant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomerBrowseRestaurant extends StatefulWidget {
   @override
@@ -94,12 +95,22 @@ class _CustomerBrowseRestaurantState extends State<CustomerBrowseRestaurant> {
                 //image
                 Material(
                   child: InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      SharedPreferences sharedPreferences =
+                          await SharedPreferences.getInstance();
+                      String customerID = sharedPreferences.getString('id');
+                      String customerName = sharedPreferences.getString('name');
+                      String customerPhone =
+                          sharedPreferences.getString('phone');
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
                               CustomerChooseMenuFromRestaurant(
+                            customerID: customerID,
+                            customerName: customerName,
+                            customerPhone: customerPhone,
                             userModel: restaurantLists[index],
                           ),
                         ),
@@ -133,12 +144,24 @@ class _CustomerBrowseRestaurantState extends State<CustomerBrowseRestaurant> {
                           //res name-------------------------------------------------
                           Material(
                             child: InkWell(
-                              onTap: () {
+                              onTap: () async {
+                                SharedPreferences sharedPreferences =
+                                    await SharedPreferences.getInstance();
+                                String customerID =
+                                    sharedPreferences.getString('id');
+                                String customerName =
+                                    sharedPreferences.getString('name');
+                                String customerPhone =
+                                    sharedPreferences.getString('phone');
+
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         CustomerChooseMenuFromRestaurant(
+                                      customerID: customerID,
+                                      customerName: customerName,
+                                      customerPhone: customerPhone,
                                       userModel: restaurantLists[index],
                                     ),
                                   ),

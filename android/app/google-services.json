@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "690433471592",
+    "firebase_url": "https://ramon-orders.firebaseio.com",
+    "project_id": "ramon-orders",
+    "storage_bucket": "ramon-orders.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:690433471592:android:37b3887e56815f62d437dd",
+        "android_client_info": {
+          "package_name": "com.bb.ramon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "690433471592-efpsh60mctia88gvn37b5v5olvumbvn0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bb.ramon",
+            "certificate_hash": "ebb2f9089115e1b7df08356659a3cf414a111567"
+          }
+        },
+        {
+          "client_id": "690433471592-itbsbp6e4h06tdlt7hsdvsed7bnpbl08.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBK1oc30DrCsp49h3xaKFCGo7QXNNJivCo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "690433471592-itbsbp6e4h06tdlt7hsdvsed7bnpbl08.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

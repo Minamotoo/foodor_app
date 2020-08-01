@@ -45,16 +45,24 @@ class _NewLoginState extends State<NewLogin> {
                       child: Column(
                         children: <Widget>[
                           Material(
-                            child: TextField(
+                            child: TextFormField(
                               onChanged: (value) => username = value.trim(),
+                              onFieldSubmitted: (v) {
+                                FocusScope.of(context).nextFocus();
+                              },
+                              textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.account_box),
                                   labelText: 'Username'),
                             ),
                           ),
                           Material(
-                            child: TextField(
+                            child: TextFormField(
                               onChanged: (value) => password = value.trim(),
+                              onFieldSubmitted: (v) {
+                                FocusScope.of(context).nextFocus();
+                              },
+                              textInputAction: TextInputAction.next,
                               obscureText: true,
                               decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.vpn_key),
@@ -153,6 +161,7 @@ class _NewLoginState extends State<NewLogin> {
           sharedPreferences.setString('id', userModel.id);
           sharedPreferences.setString('name', userModel.name);
           sharedPreferences.setString('userType', userModel.userType);
+          sharedPreferences.setString('phone', userModel.phone);
 
           if (sharedPreferences != null) {
             if (username == userModel.username &&
