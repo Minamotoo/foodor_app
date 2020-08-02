@@ -382,8 +382,10 @@ class _CustomerChooseMenuFromRestaurantState
           color: Colors.deepOrangeAccent,
           iconSize: 30,
           onPressed: () {
-            //process to buy
-            reviewOrders(context);
+            orderedList.length == 0
+                ? Dialogs().normalDialog(context,
+                    'You haven\'t chosen any menu yet!', Colors.black87)
+                : reviewOrders(context);
           },
         ),
       ],
@@ -399,30 +401,34 @@ class _CustomerChooseMenuFromRestaurantState
             'Review your orders',
             style: TextStyle(color: Colors.deepOrangeAccent),
           ),
-          content: ListView.separated(
-            itemCount: orderedList.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                  leading: CircleAvatar(
-                    radius: 27,
-                    backgroundColor: Colors.deepOrangeAccent,
-                    child: CircleAvatar(
-                      radius: 25,
-                      backgroundImage: NetworkImage(
-                          '${Constants().url}${orderedList[index].foodImageURL}'),
+          content: Container(
+            height: 800,
+            width: 300,
+            child: ListView.separated(
+              itemCount: orderedList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                    leading: CircleAvatar(
+                      radius: 27,
+                      backgroundColor: Colors.deepOrangeAccent,
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundImage: NetworkImage(
+                            '${Constants().url}${orderedList[index].foodImageURL}'),
+                      ),
                     ),
-                  ),
-                  title: Text('${orderedList[index].name}'),
-                  trailing: orderedList[index].amount > 1
-                      ? Text('${orderedList[index].amount}')
-                      : Text(''));
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return Divider(
-                height: 4,
-                color: Colors.grey,
-              );
-            },
+                    title: Text('${orderedList[index].name}'),
+                    trailing: orderedList[index].amount > 1
+                        ? Text('${orderedList[index].amount}')
+                        : Text(''));
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return Divider(
+                  height: 4,
+                  color: Colors.grey,
+                );
+              },
+            ),
           ),
           actions: <Widget>[
             RaisedButton(
