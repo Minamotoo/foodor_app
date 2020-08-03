@@ -596,7 +596,7 @@ class _CustomerChooseMenuFromRestaurantState
     if (response.toString() == '1') {
       FormData formData = FormData.fromMap({
         'ownerID': '${userModel.id}',
-        // 'customerID': '$customerID',
+        'customerID': '$customerID',
       });
       String notiUrl = '${Constants().url}/addNoti.php';
 

@@ -29,6 +29,8 @@ class _OwnerOrdersState extends State<OwnerOrders> {
   String order;
   String amount;
 
+  List<Detail> orderDetailList = List();
+
   //method
   Future<void> getOrdersInfo() async {
     getToken();
@@ -87,6 +89,8 @@ class _OwnerOrdersState extends State<OwnerOrders> {
           customerPhone = ordersDetailModel.customerPhone;
           order = detail.name;
           amount = detail.amount.toString();
+
+          orderDetailList.add(detail);
         });
       }
     }
@@ -162,16 +166,48 @@ class _OwnerOrdersState extends State<OwnerOrders> {
           margin: EdgeInsets.all(20),
           child: infoLoaded == false
               ? Loading().showLoading()
-              // : ListView.builder(
-              //     itemCount: messages == null ? 0 : messages.length,
-              //     itemBuilder: (context, index) {
-              //       return Card(child: Text(messages[index].message));
-              //     },
-              //   ),
-              : Card(
-                  child: Text(
-                      'Customer : $customerName \nPhone : $customerPhone \n$order -- $amount'),
+              : ListView.builder(
+                  itemCount: messages == null ? 0 : messages.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      child: ListTile(
+                        title: Container(
+                          height: 300,
+                          child: ListView.separated(
+                            itemCount: orderDetailList.length,
+                            itemBuilder: (context, index) {
+                              return Text(
+                                '${orderDetailList[index].name}   ${orderDetailList[index].amount}',
+                                style: TextStyle(fontSize: 18),
+                              );
+                            },
+                            separatorBuilder: (context, index) {
+                              return SizedBox(
+                                child: Divider(
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        subtitle: Text('$customerName \n $customerPhone'),
+                        trailing: FlatButton(
+                          child: Text(
+                            'DONE',
+                            style: TextStyle(fontSize: 18, color: Colors.green),
+                          ),
+                          padding: EdgeInsets.all(10),
+                          // color: Colors.green,
+                          onPressed: () {},
+                        ),
+                      ),
+                    );
+                  },
                 ),
+          // : Card(
+          //     child: Text(
+          //         'Customer : $customerName \nPhone : $customerPhone \n$orderDetailList -- $amount'),
+          //   ),
         ),
       ),
     );
