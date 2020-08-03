@@ -583,7 +583,7 @@ class _CustomerChooseMenuFromRestaurantState
       'customerID': '$customerID',
       'customerName': '$customerName',
       'customerPhone': '$customerPhone',
-      'ownerID' '': '${userModel.id}',
+      'ownerID': '${userModel.id}',
       'paymentStatus': '1',
       'orderDetail': '$orderedJSON',
       'finishStatus': '0',
@@ -595,12 +595,14 @@ class _CustomerChooseMenuFromRestaurantState
     var response = await Dio().post(url, data: formData);
     if (response.toString() == '1') {
       FormData formData = FormData.fromMap({
-        'customerID': '$customerID',
+        'ownerID': '${userModel.id}',
+        // 'customerID': '$customerID',
       });
       String notiUrl = '${Constants().url}/addNoti.php';
 
-      var responseNoti = await Dio().post(notiUrl, data: formData);
-      print(responseNoti.toString());
+      await Dio().post(notiUrl, data: formData);
+      // var responseNoti = await Dio().post(notiUrl, data: formData);
+      // print(responseNoti.toString());
     }
 
     // await Dio().post(url, data: formData).then((value) async {

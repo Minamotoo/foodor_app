@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:ramon/utilities/constants.dart';
 import 'package:ramon/utilities/loading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ramon/models/ordered_detail_model.dart';
@@ -29,11 +31,8 @@ class _OwnerOrdersState extends State<OwnerOrders> {
 
   //method
   Future<void> getOrdersInfo() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    String ownerID = sharedPreferences.getString('id');
-    print('ownerID = $ownerID');
+    getToken();
+    configureFirebaseListener();
     setState(() {
       infoLoaded = true;
     });
@@ -70,49 +69,76 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     final String mMessage = data['message'];
 
     Message m = Message(title: title, body: body, message: mMessage);
+    var res = json.decode(m.message);
+    // print(res);
+    for (var item in res) {
+      OrdersDetailModel ordersDetailModel = OrdersDetailModel.fromJson(item);
+      print(ordersDetailModel.customerName);
+      // print(ordersDetailModel.orderDetail);
+
+      var res2 = json.decode(ordersDetailModel.orderDetail);
+      for (var item2 in res2) {
+        Detail detail = Detail.fromJson(item2);
+        print(detail.name);
+        print(detail.amount);
+
+        setState(() {
+          customerName = ordersDetailModel.customerName;
+          customerPhone = ordersDetailModel.customerPhone;
+          order = detail.name;
+          amount = detail.amount.toString();
+        });
+      }
+    }
     setState(() {
       messages.add(m);
     });
-    setDetail(m);
+    // setDetail(m);
   }
 
   setDetail(Message m) {
-    setState(() {
-      strMessage = m.message.toString();
-      strMessage = strMessage.replaceAll(strMessage[0], '');
-      strMessage = strMessage.replaceAll(
-          strMessage.substring(strMessage.length - 1), '');
-      OrdersDetailModel ordersDetailModel =
-          OrdersDetailModel.fromJson(jsonDecode(strMessage));
-      // customerName = ordersDetailModel.customerName;
-      // customerPhone = ordersDetailModel.customerPhone;
+    print(m.message);
+    // setState(() {
+    //   strMessage = m.message.toString();
+    //   strMessage = strMessage.replaceAll(strMessage[0], '');
+    //   strMessage = strMessage.replaceAll(
+    //       strMessage.substring(strMessage.length - 1), '');
+    //   OrdersDetailModel ordersDetailModel =
+    //       OrdersDetailModel.fromJson(jsonDecode(strMessage));
+    //   // customerName = ordersDetailModel.customerName;
+    //   // customerPhone = ordersDetailModel.customerPhone;
 
-      print('customerName $customerName');
-      print('customerPhone $customerPhone');
+    //   // print('customerName $customerName');
+    //   // print('customerPhone $customerPhone');
 
-      var detail = ordersDetailModel.orderDetail;
+    //   var detail = ordersDetailModel.orderDetail;
 
-      // detail = detail.replaceAll(detail[0], '[{');
-      // detail = detail.replaceAll(detail.substring(detail.length - 1), '}]');
+    //   // detail = detail.replaceAll(detail[0], '[{');
+    //   // detail = detail.replaceAll(detail.substring(detail.length - 1), '}]');
 
-      Detail details = Detail.fromJson(jsonDecode(detail));
+    //   Detail details = Detail.fromJson(jsonDecode(detail));
 
-      setState(() {
-        customerName = ordersDetailModel.customerName;
-        customerPhone = ordersDetailModel.customerPhone;
-        order = details.name;
-        amount = details.amount.toString();
-      });
-    });
+    //   setState(() {
+    //     customerName = ordersDetailModel.customerName;
+    //     customerPhone = ordersDetailModel.customerPhone;
+    //     order = details.name;
+    //     amount = details.amount.toString();
+    //   });
+    // clear();
+    // });
   }
+
+  // clear() {
+  //   messages.clear();
+  // }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getOrdersInfo();
-    getToken();
-    configureFirebaseListener();
+    // getToken();
+    // configureFirebaseListener();
     messages = List<Message>();
   }
 
@@ -136,26 +162,15 @@ class _OwnerOrdersState extends State<OwnerOrders> {
           margin: EdgeInsets.all(20),
           child: infoLoaded == false
               ? Loading().showLoading()
-              : ListView.builder(
-                  itemCount: messages == null ? 0 : messages.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          child: strMessage == null
-                              ? Text('no orders')
-                              // : Text(
-                              //     strMessage,
-                              //     style: TextStyle(fontSize: 16),
-                              //   ),
-                              : ListTile(
-                                  title: Text('$order : $amount'),
-                                  subtitle:
-                                      Text('$customerName \n $customerPhone'),
-                                )),
-                    );
-                  },
+              // : ListView.builder(
+              //     itemCount: messages == null ? 0 : messages.length,
+              //     itemBuilder: (context, index) {
+              //       return Card(child: Text(messages[index].message));
+              //     },
+              //   ),
+              : Card(
+                  child: Text(
+                      'Customer : $customerName \nPhone : $customerPhone \n$order -- $amount'),
                 ),
         ),
       ),
