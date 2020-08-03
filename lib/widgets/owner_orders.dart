@@ -2,6 +2,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ramon/utilities/loading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ramon/models/ordered_detail_model.dart';
+import 'package:ramon/models/detail.dart';
+
+import 'dart:convert';
 
 class OwnerOrders extends StatefulWidget {
   @override
@@ -13,6 +17,15 @@ class _OwnerOrdersState extends State<OwnerOrders> {
   bool infoLoaded = false;
   FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   List<Message> messages;
+
+  List<String> detailList;
+
+  String strMessage;
+
+  String customerName;
+  String customerPhone;
+  String order;
+  String amount;
 
   //method
   Future<void> getOrdersInfo() async {
@@ -35,15 +48,15 @@ class _OwnerOrdersState extends State<OwnerOrders> {
   configureFirebaseListener() {
     firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print('onMessage: $message');
+        // print('onMessage: $message');
         setMessage(message);
       },
       onLaunch: (Map<String, dynamic> message) async {
-        print('onLaunch: $message');
+        // print('onLaunch: $message');
         setMessage(message);
       },
       onResume: (Map<String, dynamic> message) async {
-        print('onResume: $message');
+        // print('onResume: $message');
         setMessage(message);
       },
     );
@@ -56,9 +69,40 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     final String body = notification['body'];
     final String mMessage = data['message'];
 
+    Message m = Message(title: title, body: body, message: mMessage);
     setState(() {
-      Message m = Message(title: title, body: body, message: mMessage);
       messages.add(m);
+    });
+    setDetail(m);
+  }
+
+  setDetail(Message m) {
+    setState(() {
+      strMessage = m.message.toString();
+      strMessage = strMessage.replaceAll(strMessage[0], '');
+      strMessage = strMessage.replaceAll(
+          strMessage.substring(strMessage.length - 1), '');
+      OrdersDetailModel ordersDetailModel =
+          OrdersDetailModel.fromJson(jsonDecode(strMessage));
+      // customerName = ordersDetailModel.customerName;
+      // customerPhone = ordersDetailModel.customerPhone;
+
+      print('customerName $customerName');
+      print('customerPhone $customerPhone');
+
+      var detail = ordersDetailModel.orderDetail;
+
+      // detail = detail.replaceAll(detail[0], '[{');
+      // detail = detail.replaceAll(detail.substring(detail.length - 1), '}]');
+
+      Detail details = Detail.fromJson(jsonDecode(detail));
+
+      setState(() {
+        customerName = ordersDetailModel.customerName;
+        customerPhone = ordersDetailModel.customerPhone;
+        order = details.name;
+        amount = details.amount.toString();
+      });
     });
   }
 
@@ -97,13 +141,19 @@ class _OwnerOrdersState extends State<OwnerOrders> {
                   itemBuilder: (context, index) {
                     return Card(
                       child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        child: Text(
-                          messages[index].message,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          child: strMessage == null
+                              ? Text('no orders')
+                              // : Text(
+                              //     strMessage,
+                              //     style: TextStyle(fontSize: 16),
+                              //   ),
+                              : ListTile(
+                                  title: Text('$order : $amount'),
+                                  subtitle:
+                                      Text('$customerName \n $customerPhone'),
+                                )),
                     );
                   },
                 ),

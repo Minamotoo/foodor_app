@@ -1,4 +1,4 @@
 class Constants {
-  String url = 'http://8302b62ed9eb.ngrok.io';
+  String url = 'http://be148839b2e2.ngrok.io';
   Constants();
 }
