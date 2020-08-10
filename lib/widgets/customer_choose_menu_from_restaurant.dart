@@ -589,7 +589,6 @@ class _CustomerChooseMenuFromRestaurantState
       'finishStatus': '0',
     });
 
-    // print(orderedJSON);
     String url = '${Constants().url}/addOrders.php';
 
     var response = await Dio().post(url, data: formData);
