@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ramon/models/ordered_menu_model.dart';
+import 'package:ramon/models/orders.dart';
 import 'package:ramon/utilities/center_title.dart';
 import 'package:ramon/utilities/constants.dart';
 import 'package:ramon/utilities/loading.dart';
@@ -40,6 +41,8 @@ class _OwnerOrdersState extends State<OwnerOrders> {
   List<Detail> orderDetailList = List();
   List<List<Detail>> orderDetailList2 = List();
 
+  List<Orders> allOrders = List();
+
   String customerName;
   String customerPhone;
   String tmpCustomerName = '';
@@ -65,57 +68,10 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     await Dio().get(url).then((value) async {
       result = json.decode(value.data);
     });
+    // print(result);
     for (var item in result) {
-      OrdersDetailModel ordersDetailModel = OrdersDetailModel.fromJson(item);
-      setState(() {
-        orders.add(ordersDetailModel);
-        customerName = ordersDetailModel.customerName;
-        customerPhone = ordersDetailModel.customerPhone;
-
-        var res2 = json.decode(ordersDetailModel.orderDetail);
-        for (var item2 in res2) {
-          Detail detail = Detail.fromJson(item2);
-
-          orderDetailList.add(detail);
-        }
-
-        List<Detail> tmpList = [];
-        orderDetailList.forEach((element) => tmpList.add(element));
-        orderDetailList2.add(tmpList);
-
-        if (tmpCustomerName != customerName) {
-          orderDetailList.clear();
-          // print('after $orderDetailList2');
-        }
-        tmpCustomerName = customerName;
-      });
-    }
-
-    // String strAllOrders = orderDetailList2.toString();
-    // print(strAllOrders[0]);
-    // print(strAllOrders.substring(strAllOrders.length - 1));
-    // strAllOrders.substring(1, strAllOrders.length - 1);
-    // print(strAllOrders);
-    // for (int i = 0; i < orderDetailList2.length; i++) {
-    //   for (var item in json.decode(orderDetailList2[i].toString())) {
-    //     String str = orderDetailList2[i].toString();
-    //     String first = str[0];
-    //     String last = str.substring(str.length - 1);
-    //     str.replaceAll(first, '');
-    //     str.replaceAll(last, '');
-    //     item = str.toString();
-    //     print(item);
-    //   }
-    // }
-    for (int i = 0; i < orderDetailList2.length; i++) {
-      for (int j = 0; j < orderDetailList2[i].length; j++) {
-        print(orderDetailList2[i][j].name);
-        // var j = json.decode(orderDetailList2[i][j]);
-        // for (var item in json.decode(orderDetailList2[i][j].toString())) {
-        //   Detail detail = Detail.fromJson(item);
-        //   print(detail);
-        // }
-      }
+      Orders orders = Orders.fromJson(item);
+      allOrders.add(orders);
     }
 
     setState(() {
@@ -131,36 +87,51 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     return null;
   }
 
+  finishOrder(index) {
+    print(index);
+  }
+
+  showSnackBar(context, orderCustomer) {
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text('$orderCustomer is finished.'),
+    ));
+  }
+
   Widget orderedList() {
     return ListView.builder(
       padding: EdgeInsets.all(20),
-      itemCount: orders.length,
+      itemCount: allOrders.length,
       itemBuilder: (context, index) {
         return orderRow(context, index);
       },
     );
   }
 
-  Widget orderRow(context, index) {
+  Widget orderRow(context, i) {
     return Dismissible(
-      key: Key(orders[index].toString()),
-      onDismissed: (direction) {},
+      key: Key(allOrders[i].toString()),
+      onDismissed: (direction) {
+        var orderCustomer = allOrders[i].customerName.toString();
+        finishOrder(i);
+        showSnackBar(context, orderCustomer);
+      },
       background: removeBG(),
-      child: orders.length == 0
+      child: allOrders.length == 0
           ? CenterTitle().centerTitle14(context, 'No orders')
           : Card(
               child: ListTile(
                 title: ResponsiveContainer(
                   heightPercent: 20,
-                  widthPercent: 80,
+                  widthPercent: 50,
                   child: ListView.builder(
-                      itemCount: orderDetailList.length,
-                      itemBuilder: (context, index) {
-                        return Text(
-                            '${orderDetailList[index].name} ${orderDetailList[index].amount}');
-                      }),
+                    itemCount: allOrders[i].orderDetail.length,
+                    itemBuilder: (context, j) {
+                      return Text(
+                          '${allOrders[i].orderDetail[j].name} ${allOrders[i].orderDetail[j].amount}');
+                    },
+                  ),
                 ),
-                subtitle: Text('${orders[index].customerName}'),
+                subtitle: Text('${allOrders[i].customerName}'),
               ),
             ),
     );
@@ -185,11 +156,13 @@ class _OwnerOrdersState extends State<OwnerOrders> {
         title: Text('Customers\'s orders'),
       ),
       body: RefreshIndicator(
-          key: refreshKey,
-          onRefresh: () async {
-            onRefresh();
-          },
-          child: infoLoaded == false ? Loading().showLoading() : orderedList()),
+        key: refreshKey,
+        onRefresh: () async {
+          onRefresh();
+        },
+        child: infoLoaded == false ? Loading().showLoading() : orderedList(),
+        // child: Text('A')
+      ),
     );
   }
 
