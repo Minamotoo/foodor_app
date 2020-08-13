@@ -79,21 +79,60 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     });
   }
 
+  Future<void> refreshOrder() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String ownerID = sharedPreferences.getString('id');
+
+    String url = '${Constants().url}/getOrders.php?isAdd=true&ownerID=$ownerID';
+
+    await Dio().get(url).then((value) async {
+      result = json.decode(value.data);
+    });
+    // print(result);
+    for (var item in result) {
+      Orders orders = Orders.fromJson(item);
+      allOrders.add(orders);
+      // print(allOrders[])
+    }
+
+    setState(() {
+      infoLoaded = true;
+    });
+  }
+
   Future<Null> onRefresh() async {
     await Future.delayed(
       Duration(seconds: 1),
     );
-    //refresh new
+    refreshOrder();
     return null;
   }
 
-  finishOrder(index) {
-    print(index);
+  finishOrder(index, orderID, orderCustomer) async {
+    String url = '${Constants().url}/finishOrder.php';
+    FormData formData = FormData.fromMap({'orderID': '$orderID'});
+
+    var errorFinishMsg = 'Something\'s wrong, please refresh';
+    var response = await Dio().post(url, data: formData);
+    if (response.toString() == '1') {
+      showSnackBar(context, orderCustomer);
+      setState(() {
+        allOrders.removeAt(index);
+      });
+    } else {
+      showSnackBarError(context, errorFinishMsg);
+    }
   }
 
   showSnackBar(context, orderCustomer) {
     Scaffold.of(context).showSnackBar(SnackBar(
       content: Text('$orderCustomer is finished.'),
+    ));
+  }
+
+  showSnackBarError(context, errorFinishMsg) {
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text('$errorFinishMsg'),
     ));
   }
 
@@ -112,8 +151,8 @@ class _OwnerOrdersState extends State<OwnerOrders> {
       key: Key(allOrders[i].toString()),
       onDismissed: (direction) {
         var orderCustomer = allOrders[i].customerName.toString();
-        finishOrder(i);
-        showSnackBar(context, orderCustomer);
+        finishOrder(i, allOrders[i].id, orderCustomer);
+        // showSnackBar(context, orderCustomer);
       },
       background: removeBG(),
       child: allOrders.length == 0
