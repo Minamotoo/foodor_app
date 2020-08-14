@@ -4,7 +4,10 @@ class Orders {
   String customerName;
   String customerPhone;
   String ownerID;
+  String ownerName;
+  String ownerPhone;
   String paymentStatus;
+  String cancelStatus;
   String finishStatus;
   List<OrderDetail> orderDetail;
 
@@ -14,7 +17,10 @@ class Orders {
       this.customerName,
       this.customerPhone,
       this.ownerID,
+      this.ownerName,
+      this.ownerPhone,
       this.paymentStatus,
+      this.cancelStatus,
       this.finishStatus,
       this.orderDetail});
 
@@ -24,7 +30,10 @@ class Orders {
     customerName = json['customerName'];
     customerPhone = json['customerPhone'];
     ownerID = json['ownerID'];
+    ownerName = json['ownerName'];
+    ownerPhone = json['ownerPhone'];
     paymentStatus = json['paymentStatus'];
+    cancelStatus = json['cancelStatus'];
     finishStatus = json['finishStatus'];
     if (json['orderDetail'] != null) {
       orderDetail = new List<OrderDetail>();
@@ -41,7 +50,10 @@ class Orders {
     data['customerName'] = this.customerName;
     data['customerPhone'] = this.customerPhone;
     data['ownerID'] = this.ownerID;
+    data['ownerName'] = this.ownerName;
+    data['ownerPhone'] = this.ownerPhone;
     data['paymentStatus'] = this.paymentStatus;
+    data['cancelStatus'] = this.cancelStatus;
     data['finishStatus'] = this.finishStatus;
     if (this.orderDetail != null) {
       data['orderDetail'] = this.orderDetail.map((v) => v.toJson()).toList();

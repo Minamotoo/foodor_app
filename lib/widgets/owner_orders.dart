@@ -68,6 +68,7 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     await Dio().get(url).then((value) async {
       result = json.decode(value.data);
     });
+    print('res $result');
     // print(result);
     for (var item in result) {
       Orders orders = Orders.fromJson(item);
@@ -88,7 +89,9 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     await Dio().get(url).then((value) async {
       result = json.decode(value.data);
     });
-    // print(result);
+    setState(() {
+      allOrders.clear();
+    });
     for (var item in result) {
       Orders orders = Orders.fromJson(item);
       allOrders.add(orders);
@@ -148,7 +151,7 @@ class _OwnerOrdersState extends State<OwnerOrders> {
 
   Widget orderRow(context, i) {
     return Dismissible(
-      key: Key(allOrders[i].toString()),
+      key: UniqueKey(),
       onDismissed: (direction) {
         var orderCustomer = allOrders[i].customerName.toString();
         finishOrder(i, allOrders[i].id, orderCustomer);
@@ -170,7 +173,8 @@ class _OwnerOrdersState extends State<OwnerOrders> {
                     },
                   ),
                 ),
-                subtitle: Text('${allOrders[i].customerName}'),
+                subtitle: Text(
+                    '${allOrders[i].customerName} \n ${allOrders[i].customerPhone}'),
               ),
             ),
     );
@@ -199,7 +203,11 @@ class _OwnerOrdersState extends State<OwnerOrders> {
         onRefresh: () async {
           onRefresh();
         },
-        child: infoLoaded == false ? Loading().showLoading() : orderedList(),
+        child: infoLoaded == false
+            ? Loading().showLoading()
+            // : allOrders.length == 0
+            // ? CenterTitle().centerTitle14(context, 'No orders')
+            : orderedList(),
         // child: Text('A')
       ),
     );

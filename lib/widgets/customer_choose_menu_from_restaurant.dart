@@ -579,13 +579,19 @@ class _CustomerChooseMenuFromRestaurantState
   void onConfirmOrder(List<OrderedMenuModel> orderedList) async {
     var orderedJSON = jsonEncode(orderedList.map((e) => e.toJson()).toList());
 
+    print(userModel.restaurantName);
+    print(userModel.restaurantPhone);
+
     FormData formData = FormData.fromMap({
       'customerID': '$customerID',
       'customerName': '$customerName',
       'customerPhone': '$customerPhone',
       'ownerID': '${userModel.id}',
+      'ownerName': '${userModel.restaurantName}',
+      'ownerPhone': '${userModel.restaurantPhone}',
       'paymentStatus': '1',
       'orderDetail': '$orderedJSON',
+      'cancelStatus': '0',
       'finishStatus': '0',
     });
 
@@ -599,16 +605,16 @@ class _CustomerChooseMenuFromRestaurantState
       });
       String notiUrl = '${Constants().url}/addNoti.php';
 
-      await Dio().post(notiUrl, data: formData);
+      // await Dio().post(notiUrl, data: formData);
       // var responseNoti = await Dio().post(notiUrl, data: formData);
       // print(responseNoti.toString());
-    }
 
-    // await Dio().post(url, data: formData).then((value) async {
-    //   Navigator.pushAndRemoveUntil(
-    //       context,
-    //       MaterialPageRoute(builder: (context) => Customer()),
-    //       (route) => false);
-    // });
+      await Dio().post(notiUrl, data: formData).then((value) async {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => Customer()),
+            (route) => false);
+      });
+    }
   }
 }

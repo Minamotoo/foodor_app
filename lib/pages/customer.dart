@@ -65,19 +65,6 @@ class _CustomerState extends State<Customer> {
               ),
             ),
 
-            //browse menu
-            ListTile(
-              leading: Icon(Icons.fastfood),
-              title: Text('Browse menu'),
-              onTap: () {
-                Navigator.pop(context);
-
-                setState(() {
-                  currentWidget = CustomerBrowseMenu();
-                });
-              },
-            ),
-
             //see restaurant
             ListTile(
               leading: Icon(Icons.account_balance),
