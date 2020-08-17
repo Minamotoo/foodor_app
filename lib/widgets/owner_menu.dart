@@ -188,15 +188,33 @@ class _OwnerMenuState extends State<OwnerMenu> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             //image
-            Container(
-              padding: EdgeInsets.all(10),
-              width: 170,
-              height: 170,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  '${Constants().url}${listFood[index].foodImageURL}',
-                  fit: BoxFit.cover,
+            InkWell(
+              onTap: () {
+                //on update
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OwnerEditMenu(
+                      menuModel: listFood[index],
+                    ),
+                  ),
+                ).then((value) {
+                  setState(() {
+                    listFood.clear();
+                  });
+                  reload();
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(10),
+                width: 170,
+                height: 170,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    '${Constants().url}${listFood[index].foodImageURL}',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
