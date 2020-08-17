@@ -7,6 +7,7 @@ import 'package:ramon/utilities/center_title.dart';
 import 'package:ramon/utilities/constants.dart';
 import 'package:ramon/utilities/dialogs.dart';
 import 'package:ramon/utilities/loading.dart';
+import 'package:ramon/widgets/customer_browse_restaurants.dart';
 import 'package:responsive_container/responsive_container.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -60,18 +61,41 @@ class _CustomerOrdersState extends State<CustomerOrders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.black87,
-          title: Text('My orders'),
-        ),
-        body: RefreshIndicator(
-          key: refreshKey,
-          onRefresh: () async {
-            onRefresh();
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.black87,
+        title: Text('My orders'),
+      ),
+      body: RefreshIndicator(
+        key: refreshKey,
+        onRefresh: () async {
+          onRefresh();
+        },
+        child: infoLoaded == false ? Loading().showLoading() : orderedList(),
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        alignment: Alignment.center,
+        height: 50,
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CustomerBrowseRestaurant()),
+            );
           },
-          child: infoLoaded == false ? Loading().showLoading() : orderedList(),
-        ));
+          child: Text(
+            'Order now',
+            style: TextStyle(color: Colors.white),
+          ),
+          color: Colors.black87,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget orderedList() {
@@ -97,7 +121,7 @@ class _CustomerOrdersState extends State<CustomerOrders> {
               child: ListTile(
                 title: ResponsiveContainer(
                   heightPercent: 20,
-                  widthPercent: 50,
+                  widthPercent: 40,
                   child: ListView.builder(
                     itemCount: allOrders[i].orderDetail.length,
                     itemBuilder: (context, j) {
@@ -108,8 +132,17 @@ class _CustomerOrdersState extends State<CustomerOrders> {
                 ),
                 subtitle: Text(
                     '${allOrders[i].ownerName} \n ${allOrders[i].ownerPhone}'),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  color: Colors.red,
+                  onPressed: () {
+                    var orderOwner = allOrders[i].ownerName;
+                    deleteOrder(i, allOrders[i].id, orderOwner);
+                  },
+                ),
               ),
             ),
+      background: removeBG(),
     );
   }
 
@@ -184,6 +217,15 @@ class _CustomerOrdersState extends State<CustomerOrders> {
     setState(() {
       infoLoaded = true;
     });
+  }
+
+  Widget removeBG() {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: EdgeInsets.all(20),
+      color: Colors.red,
+      child: Icon(Icons.delete, color: Colors.white),
+    );
   }
 
   showSnackBar(context, orderOwner) {

@@ -175,6 +175,14 @@ class _OwnerOrdersState extends State<OwnerOrders> {
                 ),
                 subtitle: Text(
                     '${allOrders[i].customerName} \n ${allOrders[i].customerPhone}'),
+                trailing: IconButton(
+                  icon: Icon(Icons.check),
+                  color: Colors.green,
+                  onPressed: () {
+                    var orderCustomer = allOrders[i].customerName.toString();
+                    finishOrder(i, allOrders[i].id, orderCustomer);
+                  },
+                ),
               ),
             ),
     );
