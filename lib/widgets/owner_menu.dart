@@ -89,9 +89,9 @@ class _OwnerMenuState extends State<OwnerMenu> {
     String url =
         '${Constants().url}/getFoodWhereOwnerID.php?isAdd=true&ownerID=$ownerID';
 
-    Response response = await Dio().get(url);
-
-    if (response.toString() == 'null') {
+    var response = await Dio().get(url);
+    if (response.toString() == 'null' || response.toString() == '0') {
+      print('response sssssssssssssss = $response');
       setState(() {
         loopContent = null;
         infoLoaded = true;

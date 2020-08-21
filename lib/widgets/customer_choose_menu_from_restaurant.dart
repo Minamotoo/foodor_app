@@ -524,14 +524,14 @@ class _CustomerChooseMenuFromRestaurantState
         '${Constants().url}/getFoodWhereOwnerID.php?isAdd=true&ownerID=${userModel.id}';
 
     await Dio().get(urlGetFoodWhereOwnerID).then((value) {
-      var allMenu = json.decode(value.data);
-      if (allMenu == '0') {
+      if (value.data.toString() == '0') {
         setState(() {
           infoLoaded = true;
           noMenu = true;
         });
         showNoMenu();
       } else {
+        var allMenu = json.decode(value.data);
         // print('111111');
         for (var menu in allMenu) {
           MenuModel menuModel = MenuModel.fromJson(menu);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ramon/login.dart';
+import 'package:ramon/widgets/owner_finished_orders.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 //import widget
@@ -60,6 +61,16 @@ class _OwnerState extends State<Owner> {
                 Navigator.pop(context);
                 setState(() {
                   currentWidget = OwnerOrders();
+                });
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.done_all),
+              title: Text('Finished Orders'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  currentWidget = OwnerFinishedOrders();
                 });
               },
             ),

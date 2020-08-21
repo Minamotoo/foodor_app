@@ -68,7 +68,7 @@ class _OwnerOrdersState extends State<OwnerOrders> {
     await Dio().get(url).then((value) async {
       result = json.decode(value.data);
     });
-    print('res $result');
+    // print('res $result');
     // print(result);
     for (var item in result) {
       Orders orders = Orders.fromJson(item);
@@ -175,14 +175,6 @@ class _OwnerOrdersState extends State<OwnerOrders> {
                 ),
                 subtitle: Text(
                     '${allOrders[i].customerName} \n ${allOrders[i].customerPhone}'),
-                trailing: IconButton(
-                  icon: Icon(Icons.check),
-                  color: Colors.green,
-                  onPressed: () {
-                    var orderCustomer = allOrders[i].customerName.toString();
-                    finishOrder(i, allOrders[i].id, orderCustomer);
-                  },
-                ),
               ),
             ),
     );
