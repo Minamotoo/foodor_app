@@ -41,7 +41,7 @@ class _LoginState extends State<Login> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text('ramon'),
+          title: Text('foodor'),
         ),
         body: backFromRegister == true
             ? Loading().showLoading()
